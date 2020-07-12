@@ -5,13 +5,12 @@ import yaraparser
 
 
 def main():
-    parser = argparse.ArgumentParser(description='Parse Yara rules into a dictionary or Python object')
+    parser = argparse.ArgumentParser(
+        description="Parse Yara rules into a dictionary or Python object"
+    )
 
     parser.add_argument(
-        "--file",
-        help="File containing Yara rules to parse",
-        type=str,
-        required=True,
+        "--file", help="File containing Yara rules to parse", type=str, required=True,
     )
 
     args = parser.parse_args()

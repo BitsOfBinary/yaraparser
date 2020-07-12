@@ -3,7 +3,6 @@ import re
 
 
 class ParsedYaraImports(yarabuilder.YaraImports):
-
     def __init__(self):
         yarabuilder.YaraImports.__init__(self)
         self.carved_imports = ""
@@ -18,7 +17,6 @@ class ParsedYaraImports(yarabuilder.YaraImports):
 
 
 class ParsedYaraTags(yarabuilder.YaraTags):
-
     def __init__(self):
         yarabuilder.YaraTags.__init__(self)
         self.carved_tags = ""
@@ -65,13 +63,17 @@ class ParsedYaraMeta(yarabuilder.YaraMeta):
                 meta_name = parsed_meta_regex_matches.group(1)
                 raw_meta_value = parsed_meta_regex_matches.group(2)
 
-                parsed_raw_meta_value_matches = re.search(self._parsed_raw_meta_value_regex, raw_meta_value)
+                parsed_raw_meta_value_matches = re.search(
+                    self._parsed_raw_meta_value_regex, raw_meta_value
+                )
 
                 if bool(parsed_raw_meta_value_matches):
                     raw_meta_value = parsed_raw_meta_value_matches.group(1)
-                    #meta_comment = parsed_raw_meta_value_matches.group(2)
+                    # meta_comment = parsed_raw_meta_value_matches.group(2)
 
-                text_str_parse_matches = re.search(self._text_str_parse_regex, raw_meta_value)
+                text_str_parse_matches = re.search(
+                    self._text_str_parse_regex, raw_meta_value
+                )
 
                 if bool(text_str_parse_matches):
                     meta_value = text_str_parse_matches.group(1)
@@ -87,7 +89,9 @@ class ParsedYaraMeta(yarabuilder.YaraMeta):
                         meta_type = "bool"
 
                     else:
-                        int_str_parse_matches = re.search(self._int_str_parse_regex, raw_meta_value)
+                        int_str_parse_matches = re.search(
+                            self._int_str_parse_regex, raw_meta_value
+                        )
 
                         if bool(int_str_parse_matches):
                             meta_value = int(int_str_parse_matches.group(1))
@@ -98,7 +102,9 @@ class ParsedYaraMeta(yarabuilder.YaraMeta):
 
                 # If successfully parsed, add the values to ParsedMeta
                 if meta_name and meta_value and meta_type:
-                    meta_entry_index = self.add_meta(meta_name, meta_value, meta_type=meta_type)
+                    meta_entry_index = self.add_meta(
+                        meta_name, meta_value, meta_type=meta_type
+                    )
 
                     self.saved_meta_name = meta_name
                     self.saved_meta_index = meta_entry_index
@@ -107,7 +113,9 @@ class ParsedYaraMeta(yarabuilder.YaraMeta):
                         self.meta[meta_name][meta_entry_index].add_comment(meta_comment)
 
                     if self.saved_comment:
-                        self.meta[meta_name][meta_entry_index].add_comment(self.saved_comment, position="above")
+                        self.meta[meta_name][meta_entry_index].add_comment(
+                            self.saved_comment, position="above"
+                        )
                         self.saved_comment = None
 
                 elif meta_comment:
@@ -115,7 +123,9 @@ class ParsedYaraMeta(yarabuilder.YaraMeta):
 
         # After going through all lines, if there is a comment left, append it to the last entry
         if self.saved_comment:
-            self.meta[self.saved_meta_name][self.saved_meta_index].add_comment(self.saved_comment, position="below")
+            self.meta[self.saved_meta_name][self.saved_meta_index].add_comment(
+                self.saved_comment, position="below"
+            )
 
 
 class ParsedYaraStrings(yarabuilder.YaraStrings):
@@ -151,18 +161,18 @@ class ParsedYaraStrings(yarabuilder.YaraStrings):
                 raw_string_value = parsed_string_regex_matches.group(2)
 
                 # TODO: handle case where there is a comment after the string
-                if raw_string_value.startswith("\""):
-                    string_value = raw_string_value[1:raw_string_value.rfind("\"")]
+                if raw_string_value.startswith('"'):
+                    string_value = raw_string_value[1 : raw_string_value.rfind('"')]
                     str_type = "text"
                     string_to_add = True
 
                 elif raw_string_value.startswith("/"):
-                    string_value = raw_string_value[1:raw_string_value.rfind("/")]
+                    string_value = raw_string_value[1 : raw_string_value.rfind("/")]
                     str_type = "regex"
                     string_to_add = True
 
                 elif raw_string_value.startswith("{"):
-                    string_value = raw_string_value[1:raw_string_value.rfind("}")]
+                    string_value = raw_string_value[1 : raw_string_value.rfind("}")]
                     str_type = "hex"
                     string_to_add = True
 
@@ -171,7 +181,9 @@ class ParsedYaraStrings(yarabuilder.YaraStrings):
                     self.add_string(string_name, string_value, str_type=str_type)
 
                 else:
-                    string_name = self.add_anonymous_string(string_value, str_type=str_type)
+                    string_name = self.add_anonymous_string(
+                        string_value, str_type=str_type
+                    )
 
                 if meta_comment:
                     self.strings[string_name].add_comment(meta_comment)
@@ -180,14 +192,13 @@ class ParsedYaraStrings(yarabuilder.YaraStrings):
 
 
 class ParsedYaraCondition(yarabuilder.YaraCondition):
-
     def __init__(self):
         yarabuilder.YaraCondition.__init__(self)
         self.carved_condition = ""
 
     def parse_yara_condition(self):
 
-        conditions = self.carved_condition.strip().replace('\r', '').split('\n')
+        conditions = self.carved_condition.strip().replace("\r", "").split("\n")
 
         raw_condition = conditions[0]
 
@@ -213,7 +224,9 @@ class ParsedYaraRule(yarabuilder.YaraRule):
         self.condition = ParsedYaraCondition()
 
     def parse_rule_name(self):
-        parsed_rule_name_matches = re.search(self._parsed_rule_name_regex, self.raw_rule)
+        parsed_rule_name_matches = re.search(
+            self._parsed_rule_name_regex, self.raw_rule
+        )
 
         if parsed_rule_name_matches.group(1):
             self.rule_name = parsed_rule_name_matches.group(1)
@@ -221,7 +234,7 @@ class ParsedYaraRule(yarabuilder.YaraRule):
     def carve_yara_imports(self):
         rule_identifier_index = self.raw_rule.find("rule ")
 
-        self.imports.carved_imports = self.raw_rule[: rule_identifier_index]
+        self.imports.carved_imports = self.raw_rule[:rule_identifier_index]
 
     def carve_yara_tags(self):
         carved_tags_matches = re.search(self._carved_tags_regex, self.raw_rule)
@@ -232,23 +245,31 @@ class ParsedYaraRule(yarabuilder.YaraRule):
     def carve_yara_meta(self):
         # TODO: handle case where there is a comment after the meta tag
         if bool(re.search(r"\r?\n\s*strings:", self.raw_rule)):
-            carved_meta_regex = re.search(r"meta:\s*\r?\n(.*)\r?\n\s*strings:", self.raw_rule, re.DOTALL)
+            carved_meta_regex = re.search(
+                r"meta:\s*\r?\n(.*)\r?\n\s*strings:", self.raw_rule, re.DOTALL
+            )
 
         else:
-            carved_meta_regex = re.search(r"meta:\s*\r?\n(.*)\r?\n\s*condition:", self.raw_rule, re.DOTALL)
+            carved_meta_regex = re.search(
+                r"meta:\s*\r?\n(.*)\r?\n\s*condition:", self.raw_rule, re.DOTALL
+            )
 
         if carved_meta_regex and carved_meta_regex.group(1):
             self.meta.carved_meta = carved_meta_regex.group(1)
 
     def carve_yara_strings(self):
         # TODO: handle case where there is a comment after the meta tag
-        carved_strings_regex = re.search(r"strings:\s*\r?\n(.*)\r?\n\s*condition:", self.raw_rule, re.DOTALL)
+        carved_strings_regex = re.search(
+            r"strings:\s*\r?\n(.*)\r?\n\s*condition:", self.raw_rule, re.DOTALL
+        )
 
         if carved_strings_regex and carved_strings_regex.group(1):
             self.strings.carved_strings = carved_strings_regex.group(1)
 
     def carve_yara_condition(self):
-        carved_condition_regex = re.search(r"condition:\s*\r?\n(.*)\r?\n\s*}", self.raw_rule, re.DOTALL)
+        carved_condition_regex = re.search(
+            r"condition:\s*\r?\n(.*)\r?\n\s*}", self.raw_rule, re.DOTALL
+        )
 
         if carved_condition_regex.group(1):
             self.condition.carved_condition = carved_condition_regex.group(1)
@@ -281,9 +302,10 @@ class ParsedYaraRule(yarabuilder.YaraRule):
 
 class ParsedYaraRules(yarabuilder.YaraBuilder):
 
-    #_rule_header_regex = re.compile(r"(?:import \".*\"\s*\n)*rule [a-zA-Z0-9_]{,128}\s*:?[A-Za-z0-9_\n\r\s]*{", re.DOTALL)
-    _rule_header_regex = re.compile(r"(?:import \"\w{,20}\"\s{,128}\n)*rule [a-zA-Z0-9_]{,128}\s{,128}:?[A-Za-z0-9_\n\r\s]{,256}{", re.DOTALL)
-    #_carved_condition_regex = re.compile(r"condition:\s*\r?\n.*\r?\n\s*}", re.DOTALL)
+    _rule_header_regex = re.compile(
+        r"(?:import \"\w{,20}\"\s{,128}\n)*rule [a-zA-Z0-9_]{,128}\s{,128}:?[A-Za-z0-9_\n\r\s]{,256}{",
+        re.DOTALL,
+    )
     _carved_condition_regex = re.compile(r"condition:\s*\r?\n", re.DOTALL | re.S)
 
     def __init__(self, whitespace="    ", logger=None):
@@ -295,7 +317,9 @@ class ParsedYaraRules(yarabuilder.YaraBuilder):
 
         if condition_header_matches:
             start_of_condition = condition_header_matches.start()
-            end_of_rule = raw_rule[start_of_condition:].find("}") + start_of_condition + 1
+            end_of_rule = (
+                raw_rule[start_of_condition:].find("}") + start_of_condition + 1
+            )
 
             return end_of_rule
 
@@ -308,21 +332,27 @@ class ParsedYaraRules(yarabuilder.YaraBuilder):
         for match in rule_header_regex_matches:
             start_of_rule = match.span()[0]
             start_of_rule_content = match.span()[1]
-            end_of_rule = self._find_end_of_rule(raw_rules[start_of_rule_content:]) + start_of_rule + start_of_rule_content
+            end_of_rule = (
+                self._find_end_of_rule(raw_rules[start_of_rule_content:])
+                + start_of_rule
+                + start_of_rule_content
+            )
 
-            yara_rule = ParsedYaraRule(raw_rules[start_of_rule: end_of_rule], whitespace=self.whitespace)
+            yara_rule = ParsedYaraRule(
+                raw_rules[start_of_rule:end_of_rule], whitespace=self.whitespace
+            )
             yara_rule.parse_yara_rule()
 
             self.yara_rules[yara_rule.rule_name] = yara_rule
 
 
 def main():  # pragma: no cover
-    #raw_rule = 'import "pe"\r\nimport "math"\r\n\r\nrule test_rule : tag1 tag2 {\r\n\tmeta:\r\n\t\tdescription = "Rule for testing the yaraparser"\r\n\t\tpower_level = 9001 //it\'s over\r\n\t\tbool_test = true\r\n\t\t\r\n\tstrings:\r\n\t\t// start strings\r\n\t\t$ = "anon string"\r\n\t\t$text = "named string"\r\n\t\t// ambiguous comment\r\n\t\t$text_w_modifiers = "named string with modifiers" ascii wide\r\n\t\t\r\n\t\t$hex = {AA BB CC DD}\r\n\t\t$regex = /test[0-9]{2}/\r\n\t\t\r\n\t\t// final comment\r\n\t\t\r\n\tcondition:\r\n\t\tuint16(0) == 0x5A4D and\r\n\t\tany of them\r\n}'
+    # raw_rule = 'import "pe"\r\nimport "math"\r\n\r\nrule test_rule : tag1 tag2 {\r\n\tmeta:\r\n\t\tdescription = "Rule for testing the yaraparser"\r\n\t\tpower_level = 9001 //it\'s over\r\n\t\tbool_test = true\r\n\t\t\r\n\tstrings:\r\n\t\t// start strings\r\n\t\t$ = "anon string"\r\n\t\t$text = "named string"\r\n\t\t// ambiguous comment\r\n\t\t$text_w_modifiers = "named string with modifiers" ascii wide\r\n\t\t\r\n\t\t$hex = {AA BB CC DD}\r\n\t\t$regex = /test[0-9]{2}/\r\n\t\t\r\n\t\t// final comment\r\n\t\t\r\n\tcondition:\r\n\t\tuint16(0) == 0x5A4D and\r\n\t\tany of them\r\n}'
 
-    #rule = ParsedYaraRule(raw_rule)
-    #rule.parse_yara_rule()
+    # rule = ParsedYaraRule(raw_rule)
+    # rule.parse_yara_rule()
 
-    #print(rule.build_rule())
+    # print(rule.build_rule())
 
     with open("test.yar", "r") as infile:
         raw_rule = infile.read()
