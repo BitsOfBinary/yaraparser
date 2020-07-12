@@ -1,6 +1,4 @@
 import unittest
-import collections
-import yarabuilder
 
 from yaraparser import ParsedYaraRule, ParsedYaraTags, ParsedYaraImports, ParsedYaraMeta, ParsedYaraCondition
 
