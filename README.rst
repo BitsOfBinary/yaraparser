@@ -26,6 +26,7 @@ Via the command line::
       --file FILE  File containing Yara rules to parse
 
 Via Python:
+
 .. code-block:: python
 
     >>> import yaraparser
