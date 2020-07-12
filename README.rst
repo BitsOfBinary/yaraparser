@@ -1,7 +1,7 @@
 yaraparser
 ===========
 
-Python 3 tool to parse Yara rules (extension of yarabuilder)
+Python 3 tool to parse Yara rules (extension of `yarabuilder <https://github.com/BitsOfBinary/yarabuilder>`_)
 
 NOTE: this is still in early development (lots of edge cases to work out still)
 
